@@ -9,7 +9,9 @@ ArrayList<Point> trail = new ArrayList<Point>();
 ArrayList<Point> snail = new ArrayList<Point>();
 ArrayList<Point> ground = new ArrayList<Point>();
 ArrayList<Point> shadow = new ArrayList<Point>();
+
 Point apple = new Point(0, 7);
+
 int snailSize = 4;
 int position = 0;
 int time = 0;
@@ -33,12 +35,12 @@ class Point {
     return false;
   }
 }
+
 void setup() {
-  fullScreen();
-  //size(500, 500);
+  //fullScreen();
+  size(400, 800);
   WIDTH = width/WDIM;
   HEIGHT = height/DIM;
-  //frameRate(10);
   createGround();
 }
 
@@ -51,7 +53,6 @@ void createGround() {
     ground.add(new Point(i, 11));
   }
 }
-
 
 void createSnail() {
   if (!trail.isEmpty()) {
@@ -74,11 +75,11 @@ void drawTrail() {
 
 void drawGround() {
   for (Point p : ground) {
-    //stroke(0);
     fill(100, 230, 255, 50);
     rect(p.x*WIDTH, p.y*HEIGHT, WIDTH, HEIGHT);
   }
 }
+
 void draw() {
   background(#EBF8FA);
   appleCollision();
@@ -94,12 +95,7 @@ void draw() {
       }
     }
   }
-  for (int i = 0; i < width; i++) {
-    //for (int j = 0; j <DIM; j++) {
-    //  fill(60, 40, 34, 200);
-    //  rect(i*SIZE, j*SIZE, SIZE, SIZE);
-    //}
-  }
+
   drawApple();
   drawTrail();
   drawGround();
@@ -138,7 +134,6 @@ void gravity() {
       if (!snail.contains(t)) {
         t.y++;
       }
-      //t.y++;
     }
   }
 }
@@ -152,7 +147,6 @@ void move() {
     if (trail.size() - position > snail.size()) {
       position++;
     } else {
-      //move = false;
       position = 0;
       while (trail.size()> snail.size()) {
         trail.remove(0);
@@ -166,7 +160,6 @@ void move() {
 }
 
 void removeInvalidTrail() {
-
   for (int i = 0; i < trail.size(); i++) {
     Point t = trail.get(i);
     for (Point g : ground) {
@@ -187,51 +180,53 @@ void checkSupport() {
     }
   }
 }
-void mouseDragged() {
-  boolean include = true;
-  if (!trail.isEmpty()) {
-    if (trail.get(trail.size()-1).x== mouseX/WIDTH && trail.get(trail.size()-1).y == mouseY/HEIGHT) {
-      include = false;
-    } else {
-      for (Point p : ground) {
-        if (p.x == mouseX/WIDTH && p.y == mouseY/HEIGHT)
-          include = false;
-      }
-    }
-    move =false;
-  }
 
-  if (include) {
-    if (trail.isEmpty()) {
-      trail.add(new Point(mouseX/WIDTH, mouseY/HEIGHT));
-    } else if ((trail.get(trail.size()-1).x == mouseX/WIDTH || trail.get(trail.size()-1).y == mouseY/HEIGHT) && Math.abs(trail.get(trail.size()-1).y - mouseY/HEIGHT) <= 1 && Math.abs(trail.get(trail.size()-1).x - mouseX/WIDTH) <= 1 ) {
-      trail.add(new Point(mouseX/WIDTH, mouseY/HEIGHT));
-    }
-  }
+void mouseDragged() {
+  makeTrailFromMouse();
 }
 
 void mousePressed() {
-  boolean include = true;
+  makeTrailFromMouse();
+}
+
+void makeTrailFromMouse() {
+  boolean includeInTrail = true;
   if (!trail.isEmpty()) {
-    if (trail.get(trail.size()-1).x== mouseX/WIDTH && trail.get(trail.size()-1).y == mouseY/HEIGHT) {
-      include = false;
+    if (isAlreadyAddedTrail()) {
+      includeInTrail = false;
     } else {
       for (Point p : ground) {
         if (p.x == mouseX/WIDTH && p.y == mouseY/HEIGHT)
-          include = false;
+          includeInTrail = false;
       }
     }
     move =false;
   }
+  addTrailPoints(includeInTrail);
+}
 
-  if (include) {
-    if (trail.isEmpty()) {
-      trail.add(new Point(mouseX/WIDTH, mouseY/HEIGHT));
-    } else if ((trail.get(trail.size()-1).x == mouseX/WIDTH || trail.get(trail.size()-1).y == mouseY/HEIGHT) && Math.abs(trail.get(trail.size()-1).y - mouseY/HEIGHT) <= 1 && Math.abs(trail.get(trail.size()-1).x - mouseX/WIDTH) <= 1 ) {
-      trail.add(new Point(mouseX/WIDTH, mouseY/HEIGHT));
+boolean isAlreadyAddedTrail() {
+  return trail.get(trail.size()-1).x== mouseX/WIDTH && trail.get(trail.size()-1).y == mouseY/HEIGHT;
+}
+
+void addTrailPoints(boolean includeInTrail) {
+  if (includeInTrail) {
+    if (trail.isEmpty() || isValidTrail()) {
+      Point newTrailPoint = new Point(mouseX/WIDTH, mouseY/HEIGHT);
+      trail.add(newTrailPoint);
     }
   }
 }
+
+boolean isValidTrail() {
+  return (trail.get(trail.size()-1).x == mouseX/WIDTH || trail.get(trail.size()-1).y == mouseY/HEIGHT) && Math.abs(trail.get(trail.size()-1).y - mouseY/HEIGHT) <= 1 && Math.abs(trail.get(trail.size()-1).x - mouseX/WIDTH) <= 1 ;
+}
+
+
+boolean isValidNextMove() {
+  return true;
+}
+
 void mouseReleased() {
   move = true;
 }
